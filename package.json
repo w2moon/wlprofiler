@@ -4,7 +4,7 @@
   "description": "A minimal Electron application",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron ./build/js/main.js --inspect=5859"
   },
   "repository": "https://github.com/w2moon/wlprofiler",
   "keywords": [
@@ -13,8 +13,11 @@
     "lovigame"
   ],
   "author": "lovigame",
-  "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "~1.6.2"
+    "electron": "~1.6.2",
+    "electron-connect": "^0.6.2",
+    "gulp": "^3.9.1",
+    "gulp-sourcemaps": "^2.6.1",
+    "gulp-typescript": "^3.2.2"
   }
 }
