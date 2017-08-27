@@ -1,5 +1,5 @@
 node_modules
-profiler.VC.db
-profiler.VC.VC.opendb
+*.db
+*.opendb
 Debug/
 .vs/
