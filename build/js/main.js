@@ -15,6 +15,17 @@ function createWindow() {
         mainWindow = null;
     });
 }
+var net = require('net');
+var client = net.createConnection({ port: 13 }, function () {
+    console.log('connected to server!');
+});
+client.on('data', function (data) {
+    console.log(data.toString());
+    client.end();
+});
+client.on('end', function () {
+    console.log('disconnected from server');
+});
 electron_1.app.on('ready', createWindow);
 electron_1.app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') {
