@@ -1,1 +1,5 @@
 node_modules
+profiler.VC.db
+profiler.VC.VC.opendb
+Debug/
+.vs/
