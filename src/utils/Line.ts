@@ -1,12 +1,12 @@
-import { point } from '../utils/data'
-import { Entity } from "./Entity";
+import { Point } from '../utils/data';
+import { Entity } from './Entity';
 
 export class Line extends Entity {
-    points: Array<point>;
+    points: Array<Point>;
     lineWidth: number;
     color: string;
     lineCap: string;
-    constructor(points: Array<point>, lineWidth: number = 5, color: string = '#000000', lineCap: string = 'round') {
+    constructor(points: Array<Point>, lineWidth: number = 1, color: string = '#000000', lineCap: string = 'round') {
         super();
 
         this.points = points;
@@ -25,7 +25,7 @@ export class Line extends Entity {
 
         ctx.beginPath();
         this.points.forEach((p, idx) => {
-            if (idx != 0) {
+            if (idx !== 0) {
                 ctx.lineTo(p.x, p.y);
 
             }

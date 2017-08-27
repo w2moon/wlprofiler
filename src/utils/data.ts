@@ -1,10 +1,6 @@
 
-
-export interface point {
-    x: number,
-    y: number
+export interface Point {
+    x: number;
+    y: number;
+    [propName: string]: {};
 }
-
-
-
-

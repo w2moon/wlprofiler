@@ -2,7 +2,10 @@
 	"compileOnSave": true,
 	"compilerOptions": {
 		"module": "commonjs",
+		"allowJs": true,
+		"jsx":"react",
 		"noImplicitAny": true,
+		"experimentalDecorators": true,
 		"removeComments": true,
 		"preserveConstEnums": true,
 		"outDir": "build/js",

@@ -13,18 +13,20 @@ exports.__esModule = true;
 var Entity_1 = require("./Entity");
 var Text = (function (_super) {
     __extends(Text, _super);
-    function Text(text, color, font) {
+    function Text(text, fontSize, color, fontName) {
+        if (fontSize === void 0) { fontSize = 10; }
         if (color === void 0) { color = '#000000'; }
-        if (font === void 0) { font = '20pt Calibri'; }
+        if (fontName === void 0) { fontName = 'Calibri'; }
         var _this = _super.call(this) || this;
         _this.text = text;
         _this.color = color;
-        _this.font = font;
+        _this.fontSize = fontSize;
+        _this.fontName = fontName;
         return _this;
     }
     Text.prototype.draw = function (ctx) {
         _super.prototype.draw.call(this, ctx);
-        ctx.font = this.font;
+        ctx.font = this.fontSize + "pt " + this.fontName;
         ctx.fillStyle = this.color;
         ctx.fillText(this.text, this.position.x, this.position.y);
     };

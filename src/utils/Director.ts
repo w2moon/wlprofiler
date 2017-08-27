@@ -17,7 +17,8 @@ export class Director{
     ctx:CanvasRenderingContext2D;
     updateFuncs:Array<()=>void> = [];
     constructor(canvas:HTMLCanvasElement){
-        this.canvas = canvas
+        this.canvas = canvas;
+        
         this.scene = new Entity();
         this.ctx = canvas.getContext('2d');
 

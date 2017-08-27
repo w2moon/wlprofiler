@@ -1,23 +1,25 @@
-import { point } from '../utils/data'
-import { Entity } from "./Entity";
+import { Point } from '../utils/data';
+import { Entity } from './Entity';
 
 export class Text extends Entity {
-    text:string;
+    text: string;
     color: string;
-    font:string;
-    constructor(text:string, color: string = '#000000', font: string = '20pt Calibri') {
+    fontSize: number;
+    fontName: string;
+    constructor(text: string, fontSize: number = 10, color: string = '#000000', fontName: string = 'Calibri') {
         super();
 
-       this.text = text;
-       this.color = color;
-       this.font = font;
+        this.text = text;
+        this.color = color;
+        this.fontSize = fontSize;
+        this.fontName = fontName;
 
     }
 
     draw(ctx: CanvasRenderingContext2D) {
         super.draw(ctx);
-        
-        ctx.font = this.font;
+
+        ctx.font = `${this.fontSize}pt ${this.fontName}`;
         ctx.fillStyle = this.color;
         ctx.fillText(this.text, this.position.x, this.position.y);
     }

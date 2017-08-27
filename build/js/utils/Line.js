@@ -14,7 +14,7 @@ var Entity_1 = require("./Entity");
 var Line = (function (_super) {
     __extends(Line, _super);
     function Line(points, lineWidth, color, lineCap) {
-        if (lineWidth === void 0) { lineWidth = 5; }
+        if (lineWidth === void 0) { lineWidth = 1; }
         if (color === void 0) { color = '#000000'; }
         if (lineCap === void 0) { lineCap = 'round'; }
         var _this = _super.call(this) || this;
@@ -31,7 +31,7 @@ var Line = (function (_super) {
         ctx.lineCap = this.lineCap;
         ctx.beginPath();
         this.points.forEach(function (p, idx) {
-            if (idx != 0) {
+            if (idx !== 0) {
                 ctx.lineTo(p.x, p.y);
             }
             ctx.moveTo(p.x, p.y);

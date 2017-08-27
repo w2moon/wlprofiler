@@ -14,10 +14,17 @@
   ],
   "author": "lovigame",
   "devDependencies": {
+    "@types/react": "^16.0.5",
+    "@types/react-dom": "^15.5.4",
     "electron": "~1.6.2",
-    "electron-connect": "^0.6.2",
-    "gulp": "^3.9.1",
-    "gulp-sourcemaps": "^2.6.1",
-    "gulp-typescript": "^3.2.2"
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "react-scripts-ts": "^2.6.0"
+  },
+  "dependencies": {
+    "@types/lodash": "^4.14.74",
+    "lodash": "^4.17.4",
+    "mobx": "^3.2.2",
+    "mobx-react": "^4.2.2"
   }
 }

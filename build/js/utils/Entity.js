@@ -14,7 +14,7 @@ var Entity = (function () {
     };
     Entity.prototype.removeEntity = function (ent) {
         var idx = this.children.indexOf(ent);
-        if (idx != -1) {
+        if (idx !== -1) {
             this.children.splice(idx, 1);
         }
     };
