@@ -6,6 +6,7 @@ var ReactDOM = require("react-dom");
 var ListView_1 = require("./ListView");
 var ListItem_1 = require("./ListItem");
 var _ = require("lodash");
+var electron_1 = require("electron");
 function createTestData(frame, funcNum) {
     var funcs = {};
     var totalTime = 0;
@@ -87,9 +88,11 @@ document.getElementById('pause').addEventListener('click', function (e) {
     paused = true;
 });
 var dataQueue = [];
+electron_1.ipcRenderer.on('newFrame', function (data) {
+    console.log('new frame');
+    dataQueue.push(data);
+});
 function processData() {
-    frameTest++;
-    dataQueue.push(createTestData(frameTest, 100));
     var frame = 0;
     var data = null;
     while (data = dataQueue.shift()) {

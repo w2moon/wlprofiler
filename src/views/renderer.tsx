@@ -8,22 +8,8 @@ import * as ReactDOM from 'react-dom';
 import ListView, { ListInfo } from './ListView';
 import { ItemInfo } from './ListItem';
 import * as _ from 'lodash';
-
-interface FrameData {
-    num: number;
-    time: number;
-    frame?: number;
-    children?: FrameArray;
-}
-
-interface FrameArray {
-    [index: string]: FrameData;
-}
-
-interface FuncLine {
-    [index: string]: Array<Point>;
-}
-
+import { ipcRenderer } from 'electron';
+import { FrameArray, FrameData, FuncLine } from '../types';
 function createTestData(frame: number, funcNum: number): FrameData {
     let funcs: FrameArray = {};
     let totalTime: number = 0;
@@ -128,10 +114,15 @@ document.getElementById('pause').addEventListener('click', e => {
 });
 
 let dataQueue: Array<FrameData> = [];
+
+ipcRenderer.on('newFrame', (data: FrameData) => {
+    console.log('new frame');
+    dataQueue.push(data);
+});
 function processData() {
 
-    frameTest++;
-    dataQueue.push(createTestData(frameTest, 100));
+    // frameTest++;
+    //  dataQueue.push(createTestData(frameTest, 100));
 
     let frame = 0;
     let data = null;

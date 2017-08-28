@@ -1,7 +1,6 @@
 import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow: Electron.BrowserWindow;
@@ -17,7 +16,7 @@ function createWindow () {
   }));
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools();
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -29,14 +28,18 @@ function createWindow () {
 }
 
 const net = require('net');
-const client = net.createConnection({ port: 13}, () => {
+const client = net.createConnection({ port: 4923}, () => {
 
   console.log('connected to server!');
 
 });
 client.on('data', (data: {}) => {
-  console.log(data.toString());
-  client.end();
+  if (mainWindow){
+    console.log(data.toString());
+    mainWindow.webContents.send('newFrame', JSON.parse(data.toString()));
+  }
+  
+  // client.end();
 });
 client.on('end', () => {
   console.log('disconnected from server');

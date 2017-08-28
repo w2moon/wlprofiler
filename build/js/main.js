@@ -11,17 +11,20 @@ function createWindow() {
         protocol: 'file:',
         slashes: true
     }));
+    mainWindow.webContents.openDevTools();
     mainWindow.on('closed', function () {
         mainWindow = null;
     });
 }
 var net = require('net');
-var client = net.createConnection({ port: 13 }, function () {
+var client = net.createConnection({ port: 4923 }, function () {
     console.log('connected to server!');
 });
 client.on('data', function (data) {
-    console.log(data.toString());
-    client.end();
+    if (mainWindow) {
+        console.log(data.toString());
+        mainWindow.webContents.send('newFrame', JSON.parse(data.toString()));
+    }
 });
 client.on('end', function () {
     console.log('disconnected from server');
