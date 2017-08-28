@@ -1,3 +1,53 @@
 {
-    "tslint.autoFixOnSave": true
+    "tslint.autoFixOnSave": true,
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/node_modules": true,
+        "**/.DS_Store": true
+      },
+      "vim.easymotion": true,
+        "vim.incsearch": true,
+        "vim.useSystemClipboard": false,
+        "vim.useCtrlKeys": true,
+        "vim.hlsearch": true,
+      "vim.insertModeKeyBindings": [
+            {
+                "before": ["j","k"],
+                "after": ["<Esc>"]
+            }
+       ],
+          "vim.otherModesKeyBindingsNonRecursive": [
+            {
+                "before":["<C-n>"],
+                "after":[],
+                "commands": [
+                    {
+                        "command": ":nohl"
+                    }
+                ]
+            },
+              {
+                "before": ["leader", "w"],
+                "after": [],
+                "commands": [
+                    {
+                        "command": "workbench.action.files.save",
+                        "args": []
+                    }
+                ]
+            }
+        ],
+        "vim.leader": "<space>",
+        "vim.handleKeys":{
+            "<C-a>": false,
+            "<C-c>": false,
+            "<C-b>": false,
+            "<C-f>": false
+            
+        },
+    "vim.disableAnnoyingNeovimMessage": true,
+    "window.zoomLevel": 0
 }

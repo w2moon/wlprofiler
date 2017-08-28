@@ -40,6 +40,8 @@ function createline(start, end) {
 }
 var selectFrame = 0;
 var frameCurrent = 0;
+var frameMax = 0;
+var minFrame = 0;
 function xToFrame(x, startFrame) {
     return startFrame + x;
 }
@@ -73,7 +75,7 @@ canvas.addEventListener('click', function (e) {
     }
     var x = e.pageX - offsetX;
     var y = e.pageY - offsetY;
-    var startFrame = Math.max(frameCurrent - MaxFrameViewNum, 0);
+    var startFrame = Math.max(frameCurrent - MaxFrameViewNum, minFrame);
     selectFrame = xToFrame(x, startFrame);
     chart.setSelectX(selectFrame);
     if (mainLine[selectFrame]) {
@@ -88,14 +90,17 @@ document.getElementById('pause').addEventListener('click', function (e) {
     paused = true;
 });
 var dataQueue = [];
-electron_1.ipcRenderer.on('newFrame', function (data) {
+electron_1.ipcRenderer.on('newFrame', function (event, data) {
     dataQueue.push(data);
 });
 function processData() {
-    var frame = 0;
+    var frame = frameMax;
     var data = null;
     while (data = dataQueue.shift()) {
         frame = data.frame;
+        if (minFrame === 0) {
+            minFrame = frame;
+        }
         mainLine[frame] = { x: frame, y: data.time };
         for (var funcName in data.children) {
             var funcInfo = data.children[funcName];
@@ -107,6 +112,9 @@ function processData() {
             lineInfo[frame] = { x: frame, y: funcInfo.time, num: funcInfo.num };
         }
     }
+    if (frame > frameMax) {
+        frameMax = frame;
+    }
     return frame;
 }
 chart.scheduleUpdate(function () {
@@ -114,7 +122,7 @@ chart.scheduleUpdate(function () {
     if (!paused) {
         frameCurrent = frame;
     }
-    var startFrame = Math.max(frameCurrent - MaxFrameViewNum, 0);
+    var startFrame = Math.max(frameCurrent - MaxFrameViewNum, minFrame);
     var endFrame = startFrame + MaxFrameViewNum;
     chart.beginData(startFrame, endFrame);
     chart.setLine('common', createline({ x: startFrame, y: 16.66 }, { x: endFrame, y: 16.66 }), 'green');

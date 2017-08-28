@@ -53,6 +53,8 @@ function createline(start: Point, end: Point) {
 
 let selectFrame = 0;
 let frameCurrent = 0;
+let frameMax = 0;
+let minFrame = 0;
 
 function xToFrame(x: number, startFrame: number): number {
     return startFrame + x;
@@ -95,7 +97,7 @@ canvas.addEventListener(
 
         let x = e.pageX - offsetX;
         let y = e.pageY - offsetY;
-        let startFrame = Math.max(frameCurrent - MaxFrameViewNum, 0);
+        let startFrame = Math.max(frameCurrent - MaxFrameViewNum, minFrame);
         selectFrame = xToFrame(x, startFrame);
         chart.setSelectX(selectFrame);
         if (mainLine[selectFrame]) {
@@ -115,7 +117,7 @@ document.getElementById('pause').addEventListener('click', e => {
 
 let dataQueue: Array<FrameData> = [];
 
-ipcRenderer.on('newFrame', (data: FrameData) => {
+ipcRenderer.on('newFrame', (event: {}, data: FrameData) => {
     dataQueue.push(data);
 });
 function processData() {
@@ -123,10 +125,13 @@ function processData() {
     // frameTest++;
     //  dataQueue.push(createTestData(frameTest, 100));
 
-    let frame = 0;
+    let frame = frameMax;
     let data = null;
     while (data = dataQueue.shift()) {
         frame = data.frame;
+        if (minFrame === 0){
+            minFrame = frame;
+        }
         mainLine[frame] = { x: frame, y: data.time };
         for (let funcName in data.children) {
             let funcInfo = data.children[funcName];
@@ -138,6 +143,9 @@ function processData() {
             lineInfo[frame] = { x: frame, y: funcInfo.time, num: funcInfo.num };
         }
     }
+    if (frame > frameMax){
+        frameMax = frame;
+    }
     return frame;
 }
 
@@ -146,7 +154,7 @@ chart.scheduleUpdate(() => {
     if (!paused) {
         frameCurrent = frame;
     }
-    let startFrame = Math.max(frameCurrent - MaxFrameViewNum, 0);
+    let startFrame = Math.max(frameCurrent - MaxFrameViewNum, minFrame) ;
     let endFrame = startFrame + MaxFrameViewNum;
     chart.beginData(startFrame, endFrame);
     chart.setLine('common', createline({ x: startFrame, y: 16.66 }, { x: endFrame, y: 16.66 }), 'green');
