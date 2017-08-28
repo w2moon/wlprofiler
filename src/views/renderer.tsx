@@ -116,7 +116,6 @@ document.getElementById('pause').addEventListener('click', e => {
 let dataQueue: Array<FrameData> = [];
 
 ipcRenderer.on('newFrame', (data: FrameData) => {
-    console.log('new frame');
     dataQueue.push(data);
 });
 function processData() {

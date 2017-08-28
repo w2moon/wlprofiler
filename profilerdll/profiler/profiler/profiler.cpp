@@ -131,17 +131,23 @@ namespace wlprofiler {
 		int funcNum;
 		FuncInfo funcInfos[2048];
 	};
-	boost::lockfree::spsc_queue<FrameInfo*, boost::lockfree::capacity<1024> > spsc_queue;
+	boost::lockfree::spsc_queue<FrameInfo, boost::lockfree::capacity<1024> > spsc_queue;
 	static bool inited = false;
 	static long s_currentFrame = 0;
-	static FrameInfo* sp_frameInfo;
+	static FrameInfo sp_frameInfo;
+	static bool s_running = false;
+
+	struct StackInfo {
+		char name[256];
+		pclock::time_point tp;
+	};
 
 	void consumer(void)
 	{
 
 		boost::asio::io_service io_service;
 		tcp_server server(io_service);
-		FrameInfo* fi;
+		FrameInfo fi;
 
 		
 
@@ -152,18 +158,18 @@ namespace wlprofiler {
 			while (spsc_queue.pop(fi)) {
 
 				if (!server.hasConnection()) {
-					continue;
+					//continue;
 				}
 				//send  fi
 				ptree pt;
 				ptree pc;
 
-				pt.put("frame", fi->frame);
-				pt.put("elapsed", fi->elapsed);
+				pt.put("frame", fi.frame);
+				pt.put("elapsed", fi.elapsed);
 
-				int num = fi->funcNum;
+				int num = fi.funcNum;
 				for (int i = 0; i < num; ++i) {
-					FuncInfo& info = fi->funcInfos[i];
+					FuncInfo& info = fi.funcInfos[i];
 
 					ptree child;
 					child.put("name", info.name);
@@ -174,9 +180,9 @@ namespace wlprofiler {
 
 				std::ostringstream buf;
 				write_json(buf, pt, false);
-				server.send(buf.str());
+				std::string msg = buf.str();
+				server.send(msg);
 				
-
 			}
 		}
 		
@@ -194,39 +200,51 @@ namespace wlprofiler {
 
 	PROFILER_API void startFrame()
 	{
-
-		sp_frameInfo = new FrameInfo();
-		sp_frameInfo->frame = s_currentFrame;
-		sp_frameInfo->elapsed = 0;
-		sp_frameInfo->funcNum = 0;
+		if (!inited) {
+			return;
+		}
+		sp_frameInfo.frame = s_currentFrame;
+		sp_frameInfo.elapsed = 0;
+		sp_frameInfo.funcNum = 0;
 
 		s_bufferIdx = 0;
 		s_frameStart = pclock::now();
+		s_running = true;
 		return;
 	}
 
 	PROFILER_API void finishFrame()
 	{
 
-
-
-		sp_frameInfo->elapsed = (pclock::now() - s_frameStart).count().real / 1000000;
+		if (!s_running) {
+			return;
+		}
+		s_running = false;
+		sp_frameInfo.elapsed = (pclock::now() - s_frameStart).count().real / 1000000;
 		while (!spsc_queue.push(sp_frameInfo));
 		s_currentFrame++;
 		return;
 	}
 
-	int enterFunction() {
+	void enterFunction() {
+		if (!s_running) {
+			return;
+		}
 		s_buffers[s_bufferIdx] = pclock::now();
-		return s_bufferIdx++;
+		s_bufferIdx++;
 	}
 
-	void leaveFunction(const char* name, int bufferIdx) {
-		int curIdx = sp_frameInfo->funcNum;
-		FuncInfo& fi = (sp_frameInfo->funcInfos[curIdx]);
+	void leaveFunction(const char* name) {
+		if (!s_running) {
+			return;
+		}
+		int bufferIdx = s_bufferIdx-1;
+		int curIdx = sp_frameInfo.funcNum;
+		FuncInfo& fi = (sp_frameInfo.funcInfos[curIdx]);
 		memset(fi.name, 0, 256);
 		memcpy(fi.name, name, strlen(name));
 		fi.elapsed = (pclock::now() - s_buffers[bufferIdx]).count().real / 1000000;
-		sp_frameInfo->funcNum++;
+		sp_frameInfo.funcNum++;
+		s_bufferIdx--;
 	}
 }

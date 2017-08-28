@@ -1,0 +1,1 @@
+let a = "{ddfdfd;llfd{}fdfd}\r\n{dfdaaa}"

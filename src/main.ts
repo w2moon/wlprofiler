@@ -1,12 +1,13 @@
 import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
+import { FrameData, FrameArray } from './types';
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow: Electron.BrowserWindow;
-function createWindow () {
+function createWindow() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600});
+  mainWindow = new BrowserWindow({ width: 800, height: 600 });
 
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
@@ -28,17 +29,52 @@ function createWindow () {
 }
 
 const net = require('net');
-const client = net.createConnection({ port: 4923}, () => {
+const client = net.createConnection({ port: 4923 }, () => {
 
   console.log('connected to server!');
 
 });
+let bufferData: string = '';
 client.on('data', (data: {}) => {
-  if (mainWindow){
-    console.log(data.toString());
-    mainWindow.webContents.send('newFrame', JSON.parse(data.toString()));
+  bufferData += data.toString();
+  if (mainWindow) {
+    let pos = bufferData.indexOf('\n');
+    while (pos !== -1) {
+      let str = bufferData.substr(0, pos);
+      bufferData = bufferData.substr(pos + 1);
+      let obj = JSON.parse(str);
+      let children: FrameArray = {};
+      let funcInfos = obj.funcInfos;
+      if (funcInfos) {
+        for (let i = 0; i < funcInfos.length; ++i) {
+          let funcInfo = children[funcInfos[i].name];
+          if (!funcInfo) {
+            children[funcInfos[i].name] = {
+              num: 1,
+              time: parseFloat(funcInfos[i].elapsed),
+            };
+          } else {
+            funcInfo.num++;
+            funcInfo.time += parseFloat(funcInfos[i].elapsed);
+          }
+
+        }
+
+      }
+      let frameData: FrameData = {
+        num: 1,
+        frame: parseInt(obj.frame),
+        time: parseFloat(obj.elapsed),
+        children: children,
+      };
+
+      mainWindow.webContents.send('newFrame', frameData);
+
+      pos = bufferData.indexOf('\n');
+    }
+
   }
-  
+
   // client.end();
 });
 client.on('end', () => {

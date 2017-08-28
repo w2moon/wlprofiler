@@ -89,7 +89,6 @@ document.getElementById('pause').addEventListener('click', function (e) {
 });
 var dataQueue = [];
 electron_1.ipcRenderer.on('newFrame', function (data) {
-    console.log('new frame');
     dataQueue.push(data);
 });
 function processData() {

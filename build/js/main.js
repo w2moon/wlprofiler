@@ -20,10 +20,41 @@ var net = require('net');
 var client = net.createConnection({ port: 4923 }, function () {
     console.log('connected to server!');
 });
+var bufferData = '';
 client.on('data', function (data) {
+    bufferData += data.toString();
     if (mainWindow) {
-        console.log(data.toString());
-        mainWindow.webContents.send('newFrame', JSON.parse(data.toString()));
+        var pos = bufferData.indexOf('\n');
+        while (pos !== -1) {
+            var str = bufferData.substr(0, pos);
+            bufferData = bufferData.substr(pos + 1);
+            var obj = JSON.parse(str);
+            var children = {};
+            var funcInfos = obj.funcInfos;
+            if (funcInfos) {
+                for (var i = 0; i < funcInfos.length; ++i) {
+                    var funcInfo = children[funcInfos[i].name];
+                    if (!funcInfo) {
+                        children[funcInfos[i].name] = {
+                            num: 1,
+                            time: parseFloat(funcInfos[i].elapsed)
+                        };
+                    }
+                    else {
+                        funcInfo.num++;
+                        funcInfo.time += parseFloat(funcInfos[i].elapsed);
+                    }
+                }
+            }
+            var frameData = {
+                num: 1,
+                frame: parseInt(obj.frame),
+                time: parseFloat(obj.elapsed),
+                children: children
+            };
+            mainWindow.webContents.send('newFrame', frameData);
+            pos = bufferData.indexOf('\n');
+        }
     }
 });
 client.on('end', function () {

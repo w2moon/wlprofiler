@@ -12,11 +12,7 @@ int main()
 
 		wlprofiler::startFrame();
 
-		for (int i = 0; i < 100; ++i) {
-			int idx = wlprofiler::enterFunction();
-
-			wlprofiler::leaveFunction("funcs",idx);
-		}
+		
 
 		wlprofiler::finishFrame();
 	}
