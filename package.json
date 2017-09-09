@@ -22,6 +22,7 @@
     "react-scripts-ts": "^2.6.0"
   },
   "dependencies": {
+    "@types/es6-promise": "0.0.33",
     "@types/lodash": "^4.14.74",
     "lodash": "^4.17.4",
     "mobx": "^3.2.2",

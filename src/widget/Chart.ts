@@ -101,7 +101,6 @@ export class Chart extends Director {
             let pts = this.selectLine.points;
             pts.forEach(p => {
                 p.x = this.selectX - this.startX;
-                console.log(`${p.x}ppp`);
             });
         }
 

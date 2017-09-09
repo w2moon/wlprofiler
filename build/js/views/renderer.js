@@ -64,7 +64,26 @@ function showFrameInfo(frame) {
         listInfo.add(frames[i]);
     }
 }
+canvas.addEventListener('keyup', function (e) {
+    if (e.key === 'ArrowLeft') {
+        doSelectFrame(Math.max(0, selectFrame - 1));
+    }
+    else if (e.key === 'ArrowRight') {
+        doSelectFrame(selectFrame + 1);
+    }
+    else if (e.key === ' ') {
+        paused = !paused;
+    }
+}, true);
+function doSelectFrame(frame) {
+    selectFrame = frame;
+    chart.setSelectX(selectFrame);
+    if (mainLine[selectFrame]) {
+        showFrameInfo(selectFrame);
+    }
+}
 canvas.addEventListener('click', function (e) {
+    console.log('clikc');
     var offsetX = 0, offsetY = 0;
     var element = canvas;
     if (element.offsetParent) {
@@ -77,10 +96,7 @@ canvas.addEventListener('click', function (e) {
     var y = e.pageY - offsetY;
     var startFrame = Math.max(frameCurrent - MaxFrameViewNum, minFrame);
     selectFrame = xToFrame(x, startFrame);
-    chart.setSelectX(selectFrame);
-    if (mainLine[selectFrame]) {
-        showFrameInfo(selectFrame);
-    }
+    doSelectFrame(selectFrame);
 }, true);
 var paused = false;
 document.getElementById('play').addEventListener('click', function (e) {

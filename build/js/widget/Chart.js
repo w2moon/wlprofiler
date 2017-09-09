@@ -82,7 +82,6 @@ var Chart = (function (_super) {
             var pts = this.selectLine.points;
             pts.forEach(function (p) {
                 p.x = _this.selectX - _this.startX;
-                console.log(p.x + "ppp");
             });
         }
     };

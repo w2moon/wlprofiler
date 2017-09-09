@@ -20,6 +20,8 @@ using boost::property_tree::write_json;
 using boost::asio::ip::tcp;
 namespace wlprofiler {
 	static int s_port = 4923;
+	static const int MAX_FUNC_NUM = 4096;
+	static const int NAME_NUM = 64;
 	class tcp_connection
 		: public boost::enable_shared_from_this<tcp_connection>
 	{
@@ -122,14 +124,14 @@ namespace wlprofiler {
 	pclock::time_point s_frameStart;
 	static int s_bufferIdx = 0;
 	struct FuncInfo {
-		char name[256];
-		long elapsed;
+		char name[NAME_NUM];
+		float elapsed;
 	};
 	struct FrameInfo {
 		int frame;
-		long elapsed;
+		float elapsed;
 		int funcNum;
-		FuncInfo funcInfos[2048];
+		FuncInfo funcInfos[MAX_FUNC_NUM];
 	};
 	boost::lockfree::spsc_queue<FrameInfo, boost::lockfree::capacity<1024> > spsc_queue;
 	static bool inited = false;
@@ -137,10 +139,7 @@ namespace wlprofiler {
 	static FrameInfo sp_frameInfo;
 	static bool s_running = false;
 
-	struct StackInfo {
-		char name[256];
-		pclock::time_point tp;
-	};
+	
 
 	void consumer(void)
 	{
@@ -158,7 +157,7 @@ namespace wlprofiler {
 			while (spsc_queue.pop(fi)) {
 
 				if (!server.hasConnection()) {
-					//continue;
+					continue;
 				}
 				//send  fi
 				ptree pt;
@@ -241,10 +240,14 @@ namespace wlprofiler {
 		int bufferIdx = s_bufferIdx-1;
 		int curIdx = sp_frameInfo.funcNum;
 		FuncInfo& fi = (sp_frameInfo.funcInfos[curIdx]);
-		memset(fi.name, 0, 256);
-		memcpy(fi.name, name, strlen(name));
+		
 		fi.elapsed = (pclock::now() - s_buffers[bufferIdx]).count().real / 1000000;
-		sp_frameInfo.funcNum++;
+		if (fi.elapsed > 0) {
+			memset(fi.name, 0, NAME_NUM);
+			memcpy(fi.name, name, strlen(name));
+			sp_frameInfo.funcNum++;
+		}
+		
 		s_bufferIdx--;
 	}
 }

@@ -84,8 +84,31 @@ function showFrameInfo(frame: number) {
 }
 
 canvas.addEventListener(
+    'keyup',
+    e => {
+        if (e.key === 'ArrowLeft') {
+            doSelectFrame(Math.max(0, selectFrame - 1));
+        } else if (e.key === 'ArrowRight') {
+            doSelectFrame(selectFrame + 1);
+        } else if(e.key === ' '){
+            paused = !paused;
+        }
+        
+    },
+    true);
+
+function doSelectFrame(frame: int) {
+    selectFrame = frame;
+    chart.setSelectX(selectFrame);
+    if (mainLine[selectFrame]) {
+        showFrameInfo(selectFrame);
+    }
+
+}
+canvas.addEventListener(
     'click',
     e => {
+        console.log('clikc');
         let offsetX = 0, offsetY = 0;
         let element: HTMLElement = canvas;
         if (element.offsetParent) {
@@ -99,10 +122,7 @@ canvas.addEventListener(
         let y = e.pageY - offsetY;
         let startFrame = Math.max(frameCurrent - MaxFrameViewNum, minFrame);
         selectFrame = xToFrame(x, startFrame);
-        chart.setSelectX(selectFrame);
-        if (mainLine[selectFrame]) {
-            showFrameInfo(selectFrame);
-        }
+        doSelectFrame(selectFrame);
     },
     true
 );
@@ -129,7 +149,7 @@ function processData() {
     let data = null;
     while (data = dataQueue.shift()) {
         frame = data.frame;
-        if (minFrame === 0){
+        if (minFrame === 0) {
             minFrame = frame;
         }
         mainLine[frame] = { x: frame, y: data.time };
@@ -143,7 +163,7 @@ function processData() {
             lineInfo[frame] = { x: frame, y: funcInfo.time, num: funcInfo.num };
         }
     }
-    if (frame > frameMax){
+    if (frame > frameMax) {
         frameMax = frame;
     }
     return frame;
@@ -154,7 +174,7 @@ chart.scheduleUpdate(() => {
     if (!paused) {
         frameCurrent = frame;
     }
-    let startFrame = Math.max(frameCurrent - MaxFrameViewNum, minFrame) ;
+    let startFrame = Math.max(frameCurrent - MaxFrameViewNum, minFrame);
     let endFrame = startFrame + MaxFrameViewNum;
     chart.beginData(startFrame, endFrame);
     chart.setLine('common', createline({ x: startFrame, y: 16.66 }, { x: endFrame, y: 16.66 }), 'green');
