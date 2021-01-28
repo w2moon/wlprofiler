@@ -16,7 +16,7 @@
   "devDependencies": {
     "@types/react": "^16.0.5",
     "@types/react-dom": "^15.5.4",
-    "electron": "~1.6.2",
+    "electron": "~9.4.0",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-scripts-ts": "^2.6.0"
